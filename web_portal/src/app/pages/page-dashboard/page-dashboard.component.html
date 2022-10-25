@@ -1,0 +1,31 @@
+<app-sidebar>
+  <div header>
+    <h3>Dentoboard</h3>
+    <h6>All your Dentistry Needs</h6>
+  </div>
+  <div menu>
+    <app-tree>
+      <app-tree-level>
+        <app-tree-item toggler>
+          <app-sidebar-link label="Module 1"></app-sidebar-link>
+        </app-tree-item>
+      </app-tree-level>
+      <app-tree-level>
+        <app-tree-item toggler>
+          <app-sidebar-link label="Module 2"></app-sidebar-link>
+        </app-tree-item>
+      </app-tree-level>
+      <app-tree-level>
+        <app-tree-item toggler>
+          <app-sidebar-link label="Module 3"></app-sidebar-link>
+        </app-tree-item>
+      </app-tree-level>
+    </app-tree>
+  </div>
+  <div footer>
+    <h6>Dent</h6>
+    <span>Your Board</span>
+  </div>
+</app-sidebar>
+
+<app-data-table module="authenticate" model="user" [page-size]="300"></app-data-table>

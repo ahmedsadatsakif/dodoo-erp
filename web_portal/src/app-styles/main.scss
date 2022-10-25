@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind utilities;
+@tailwind components;
+@tailwind variants;
+
+@layer base {
+  @import "base";
+}
+
+@layer components {
+  .sidebar {
+    @apply shadow-lg shadow-indigo-900 bg-indigo-600 text-indigo-50 w-72;
+    .sidebar-wrapper {
+      @apply p-4;
+      .sidebar-footer {
+        @apply border-t border-slate-50;
+      }
+    }
+    .sidebar-link {
+      @apply transition-all duration-300 ease-in  border-l border-b-emerald-300 no-underline hover:bg-indigo-900;
+    }
+  }
+}

@@ -1,0 +1,3 @@
+[submodule ".\\web_portal\\"]
+	path = .\\web_portal\\
+	url = https://gitlab.com/isometric-technology/dodoo-frontend.git

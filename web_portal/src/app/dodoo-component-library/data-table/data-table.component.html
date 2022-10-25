@@ -1,0 +1,19 @@
+<div class="data-table-wrapper p-4">
+  <table class="data-table table w-full">
+    <thead>
+      <tr class="data-table-header bg-indigo-800 text-indigo-50 font-medium font-lg border border-slate-50">
+        <td *ngFor="let head of headers|async;" class="data-table-header-cell border px-2 py-1">
+          <span>{{head.label}}</span>
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of dataset|async;" class="data-table-body border border-indigo-800">
+        <td *ngFor="let item of getRowData(data);" class="data-table-body-cell border px-2 py-1">
+          
+        </td>
+      </tr>
+    </tbody>
+    <tfoot></tfoot>
+  </table>
+</div>
