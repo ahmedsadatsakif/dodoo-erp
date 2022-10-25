@@ -40,6 +40,10 @@ INSTALLED_APPS = [
 
     'modules.base',
     'modules.authenticate',
+    'modules.doctor',
+    'modules.patient',
+    'modules.appointment',
+    'modules.prescription'
 ]
 
 MIDDLEWARE = [
