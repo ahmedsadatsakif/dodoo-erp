@@ -170,9 +170,20 @@ def get_model_schema(model_class, recursive=False):
 	return schema
 
 
-class RestModel(models.Model):
+class BaseModel(models.Model):
 	class Meta:
 		abstract = True
+
+	name = models.CharField(max_length=255)
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
+
+	@property
+	def display_name(self):
+		return self.name
+
+	def __str__(self):
+		return self.display_name
 
 	def _serialized(self, recursive=False):
 		return json_serialize_model(self, recursive)
