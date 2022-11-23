@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models as m
 from ..base.models import BaseModel
 from ..doctor import models as doctor

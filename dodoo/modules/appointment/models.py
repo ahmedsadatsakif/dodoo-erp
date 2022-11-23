@@ -17,3 +17,10 @@ class Appointment(BaseModel):
 	])
 	is_confirmed = m.BooleanField(default=False)
 
+
+class AppointmentAccount(BaseModel):
+	for_appointment = m.ForeignKey(Appointment, on_delete=models.CASCADE)
+	base_amount = m.FloatField()
+	discount_amount = m.FloatField()
+	deductible_items = m.ManyToManyField()
+
