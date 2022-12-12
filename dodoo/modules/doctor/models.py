@@ -11,6 +11,17 @@ class Degree(BaseModel):
 
 
 class Doctor(BaseModel):
+	public_methods = [
+		{
+			'name': 'get_schedule',
+			'label': 'Get Schedule'
+		},
+		{
+			'name': 'search_doctor',
+			'label': 'Search Doctor'
+		}
+	]
+
 	title = m.CharField(max_length=31)
 	profile_image = m.ImageField(upload_to='doctor/profile')
 	specializations = m.ManyToManyField(Specialization)

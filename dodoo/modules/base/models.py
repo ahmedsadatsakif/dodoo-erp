@@ -154,25 +154,72 @@ def get_field_type(field):
 
 
 def get_model_schema(model_class, recursive=False):
+	shape = model_class.form_shape
 	local_fields = model_class._meta.local_fields
-	schema = {}
+	schema = []
 	for field in local_fields:
 		field_dict = field.__dict__
-		print(field_dict)
-		schema[field.name] = {
+		print("Field Dict", field_dict)
+		base = {
 			'name': field_dict.get('name', None),
 			'label': field_dict.get('verbose_name', None),
 			'type': get_field_type(field),
 			'required': field_dict.get('blank', True) is False,
 			'unique': field_dict.get('_unique', field_dict.get('primary_key', False)),
 			'max_length': field_dict.get('max_length', None),
+			'colsize':  shape.get(field_dict.get('name', None), 1)
 		}
-	return schema
+		default = field_dict.get('default', None)
+		if default != models.fields.NOT_PROVIDED:
+			base['default'] = default
+		choices = field_dict.get('choices', None)
+		is_relation = field_dict.get('is_relation', None)
+
+		# Handle choice options
+		if is_relation:
+			related_name = field_dict.get('remote_field')
+			print(related_name.__dict__)
+			base['choices'] = {
+				'type': 'records',
+				'model': related_name.__dict__.get('model', None)._meta.label,
+			}
+		if choices is not None:
+			choice_set = get_standard_choices(choices)
+			base['choices'] = {
+				'type': 'static',
+				'options': choice_set
+			}
+
+		schema.append(base)
+
+	return {
+		'fields': schema,
+
+	}
+
+
+def get_standard_choices(choices):
+	choice_set = []
+	for choice in choices:
+		val, label = choice
+		choice_set.append({
+			'value': val,
+			'label': label
+		})
+	return choice_set
 
 
 class BaseModel(models.Model):
 	class Meta:
 		abstract = True
+
+	form_shape = {
+		'name': 2,
+		'created_at': 1,
+		'updated_at': 1
+	}
+
+	public_methods = []
 
 	name = models.CharField(max_length=255)
 	created_at = models.DateTimeField(auto_now_add=True)
@@ -189,12 +236,16 @@ class BaseModel(models.Model):
 		return json_serialize_model(self, recursive)
 
 	@classmethod
-	def schema(cls, data):
+	def schema(cls, request, **params):
 		return get_model_schema(cls)
 
 	@classmethod
-	def new(cls, data):
-		instance = deserialize_json(cls, data, recursive=True)
+	def get_methods(cls, request, **params):
+		return cls.public_methods
+
+	@classmethod
+	def new(cls, **params):
+		instance = deserialize_json(cls, recursive=True, **params)
 		instance.save()
 		return instance._serialized()
 

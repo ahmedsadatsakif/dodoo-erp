@@ -22,4 +22,4 @@ def procedural_model_view(request: HttpRequest, module: str, model: str, functio
 	print(params)
 	callable_func = getattr(model_class, function)
 	print(callable_func)
-	return JsonResponse(callable_func(request, **params))
+	return JsonResponse(callable_func(request, **params), safe=False)

@@ -5,6 +5,14 @@ from ..patient import models as patient
 
 
 class Appointment(BaseModel):
+
+	form_shape = {
+		'scheduled_time': 4,
+		'type': 3,
+		'of_doctor': 4,
+		'of_patient': 4,
+	}
+
 	of_doctor = m.ForeignKey(doctor.Doctor, on_delete=m.CASCADE)
 	of_patient = m.ForeignKey(patient.Patient, on_delete=m.CASCADE)
 	scheduled_time = m.DateTimeField()
@@ -19,8 +27,8 @@ class Appointment(BaseModel):
 
 
 class AppointmentAccount(BaseModel):
-	for_appointment = m.ForeignKey(Appointment, on_delete=models.CASCADE)
+	for_appointment = m.ForeignKey(Appointment, on_delete=m.CASCADE)
 	base_amount = m.FloatField()
 	discount_amount = m.FloatField()
-	deductible_items = m.ManyToManyField()
+	# deductible_items = m.ManyToManyField()
 

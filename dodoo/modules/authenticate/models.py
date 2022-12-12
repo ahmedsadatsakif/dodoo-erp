@@ -1,12 +1,27 @@
 import uuid
 from datetime import datetime, timedelta
 import jwt
+from django.apps import registry
 from django.conf import settings
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from django.dispatch import dispatcher
 from django.contrib.auth import authenticate
 import django.contrib.auth.models as auth_models
+
+from ..base.models import BaseModel
+
+
+def camelcase_to_title(camelcase):
+	camel = camelcase.strip()
+	out = ''
+	last_idx = 0
+	for i in range(len(camel)):
+		if camel[i] in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' and i > 0:
+			out += camel[last_idx: i] + ' '
+			last_idx = i
+	out += camel[last_idx:]
+	return out
 
 
 @dispatcher.receiver(models.signals.post_save)
@@ -18,7 +33,7 @@ def assign_user_account(signal, sender, instance, **kwargs):
 			account.save()
 
 
-class ApiToken(models.Model):
+class ApiToken(BaseModel):
 	application_name = models.CharField(max_length=127)
 	application_id = models.SlugField(max_length=127, unique=True)
 	token = models.CharField(max_length=127, unique=True)
@@ -41,7 +56,7 @@ class ApiToken(models.Model):
 			return default_inst
 
 
-class Account(models.Model):
+class Account(BaseModel):
 	user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='accounts', on_delete=models.CASCADE)
 	api = models.ForeignKey(ApiToken, related_name='accounts', null=True, blank=False, on_delete=models.CASCADE)
 	session_token = models.CharField(max_length=127, db_index=True)
@@ -88,3 +103,33 @@ class Account(models.Model):
 				acc = None
 			if bearer == 'Bearer' and acc is not None:
 				return Account.serialized_session_data(acc)
+
+	@classmethod
+	def get_modules(cls, request, **params):
+		# todo: User group permission check (module perms / model perms)
+		apps = registry.apps.get_app_configs()
+		reg = []
+		for app in apps:
+			models = app.get_models()
+			mods = []
+			for model in models:
+				methods = []
+				if hasattr(model, 'public_methods'):
+					methods = model.public_methods
+					# mods[model._meta.label[len(app.label)+1:]] = model.public_methods
+				mod = {
+					'name': model._meta.label[len(app.label)+1:],
+					'label': camelcase_to_title(model._meta.label[len(app.label)+1:]),
+				}
+				if methods != []:
+					mod['children']: methods
+				mods.append(mod)
+			if mods != []:
+				reg.append({
+					'name': app.label,
+					'label': app.label.capitalize(),
+					'children': mods
+				})
+				# reg[app.label] = mods
+		print(reg)
+		return reg
